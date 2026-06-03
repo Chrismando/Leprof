@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Meet The Prof | Édition Prestige</title>
+    <!-- Bootstrap 5 + Icons + Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, #050505, #000000);
+            min-height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* ==================== LOADER 3D AVEC DÉFORMATION LENTE (10 secondes) ==================== */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.5s ease-out;
+        }
+
+        .loader-content {
+            text-align: center;
+            perspective: 1000px;
+        }
+
+        .loader-logo {
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
+            animation: morphLogoSlow 10s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+            transform-style: preserve-3d;
+        }
+
+        .loader-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 30px rgba(0, 198, 255, 0.6));
+        }
+
+        /* Animation lente de déformation (10 secondes) */
+        @keyframes morphLogoSlow {
+            0% {
+                transform: scale(0.3) rotateX(90deg) rotateY(90deg) skew(30deg, 30deg);
+                opacity: 0;
+                filter: blur(10px);
+            }
+            15% {
+                transform: scale(0.6) rotateX(45deg) rotateY(45deg) skew(20deg, 20deg);
+                opacity: 0.3;
+            }
+            30% {
+                transform: scale(0.9) rotateX(20deg) rotateY(20deg) skew(10deg, 10deg);
+                opacity: 0.6;
+            }
+            50% {
+                transform: scale(1.1) rotateX(10deg) rotateY(10deg) skew(5deg, 5deg);
+                opacity: 0.8;
+            }
+            70% {
+                transform: scale(1.05) rotateX(5deg) rotateY(5deg) skew(2deg, 2deg);
+                opacity: 0.95;
+            }
+            100% {
+                transform: scale(1) rotateX(0deg) rotateY(0deg) skew(0deg, 0deg);
+                opacity: 1;
+                filter: blur(0);
+            }
+        }
+
+        .loader-content h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #00c6ff, #a020f0, #ff4d6d);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 5s infinite, textFadeIn 2s ease-out;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        @keyframes textFadeIn {
+            from { opacity: 0; transform: translateY(30px); letter-spacing: 10px; }
+            to { opacity: 1; transform: translateY(0); letter-spacing: normal; }
+        }
+
+        /* ==================== PAGES AVEC TRANSITION 3D DE 5 SECONDES ==================== */
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            transition: all 2.5s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            opacity: 0;
+            transform: perspective(1200px) rotateY(45deg) rotateX(10deg) scale(0.8) translateZ(-150px);
+            pointer-events: none;
+            padding: 20px;
+            background: radial-gradient(circle at 10% 20%, #050505, #000000);
+            backface-visibility: hidden;
+        }
+
+        .page.active {
+            opacity: 1;
+            transform: perspective(1200px) rotateY(0deg) rotateX(0deg) scale(1) translateZ(0px);
+            pointer-events: auto;
+            z-index: 10;
+            transition: all 2.8s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        }
+
+        .page.exit {
+            opacity: 0;
+            transform: perspective(1200px) rotateY(-45deg) rotateX(-10deg) scale(0.75) translateZ(-180px);
+            pointer-events: none;
+            transition: all 2.2s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        }
+
+        /* ==================== GLASSMORPHISM ==================== */
+        .glass-card {
+            background: rgba(20, 20, 30, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            border: 1px solid rgba(0, 198, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            transition: all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            animation: cardFadeIn 0.8s ease-out;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 45px rgba(0, 198, 255, 0.5);
+            border-color: rgba(0, 198, 255, 0.6);
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .btn-premium {
+            background: linear-gradient(95deg, #0a0a0a, #1f1f3a);
+            border: 1px solid rgba(0, 198, 255, 0.6);
+            color: white;
+            border-radius: 3rem;
+            padding: 14px 28px;
+            font-weight: 600;
+            transition: all 0.4s ease;
+        }
+
+        .btn-premium:hover {
+            background: linear-gradient(135deg, #00c6ff, #a020f0);
+            border-color: white;
+            box-shadow: 0 0 25px #00a6ff;
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        /* Logo dans le profil - TRÈS GRAND */
+        .profile-logo {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            animation: logoFloat 4s infinite ease-in-out;
+        }
+
+        .profile-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 25px rgba(0, 198, 255, 0.5));
+        }
+
+        @keyframes logoFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .badge-verified {
+            background: #1da1f2;
+            color: white;
+            border-radius: 50px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Chat bubbles */
+        .chat-bubble-user {
+            background: linear-gradient(145deg, #0b5e7c, #0a2b3b);
+            border-radius: 1.8rem 1.8rem 0.5rem 1.8rem;
+            padding: 12px 18px;
+            max-width: 80%;
+            align-self: flex-end;
+            animation: bubbleSlideIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .chat-bubble-prof {
+            background: rgba(45, 45, 65, 0.9);
+            border-radius: 1.8rem 1.8rem 1.8rem 0.5rem;
+            padding: 12px 18px;
+            max-width: 80%;
+            animation: bubbleSlideIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        @keyframes bubbleSlideIn {
+            from { opacity: 0; transform: translateX(20px) scale(0.9); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        .call-timer {
+            font-family: monospace;
+            font-size: 3.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px cyan;
+            letter-spacing: 5px;
+            animation: timerPulse 1.5s infinite alternate;
+        }
+
+        @keyframes timerPulse {
+            from { text-shadow: 0 0 10px cyan; }
+            to { text-shadow: 0 0 35px cyan; }
+        }
+
+        /* Animation d'entrée des éléments */
+        .animate-on-load {
+            animation: slideUpSmooth 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideUpSmooth {
+            from { opacity: 0; transform: translateY(50px) rotateX(10deg); }
+            to { opacity: 1; transform: translateY(0) rotateX(0deg); }
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #111; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #00c6ff, #a020f0); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<!-- LOADER 10 SECONDES AVEC DÉFORMATION -->
+<div id="loaderScreen" class="loader-overlay">
+    <div class="loader-content">
+        <div class="loader-logo">
+            <img src="prof.png" alt="Logo Prof" onerror="this.src='https://placehold.co/280x280/00c6ff/white?text=PROF'">
+        </div>
+        <h1>MEET THE PROF</h1>
+        <div class="mt-4">
+            <i class="bi bi-star-fill" style="color: #00c6ff; font-size: 2rem; animation: pulseGlow 2s infinite alternate;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="appContainer" style="display: none;">
+
+    <!-- PAGE ACCUEIL AVEC GRAND LOGO -->
+    <div id="homePage" class="page active">
+        <div class="container py-4">
+            <div class="text-center">
+                <div class="profile-logo animate-on-load" style="animation-delay: 0.1s;">
+                    <img src="prof.png" alt="Le Prof" onerror="this.src='https://placehold.co/200x200/00c6ff/white?text=PROF'">
+                </div>
+                <h2 class="fw-bold mt-3 animate-on-load" style="animation-delay: 0.2s;">LE PROF <span class="badge-verified"><i class="bi bi-check-circle-fill"></i> Vérifié</span></h2>
+                <p class="text-muted mt-2 animate-on-load" style="animation-delay: 0.3s;">⭐ 4.9 • 125K followers</p>
+                <p class="mt-3 animate-on-load" style="animation-delay: 0.4s;">Discutez directement avec Le Prof via message privé ou appel audio.</p>
+            </div>
+
+            <div class="row g-4 mt-4">
+                <div class="col-12 animate-on-load" style="animation-delay: 0.5s;">
+                    <div class="glass-card p-4 text-center">
+                        <i class="bi bi-chat-dots-fill" style="font-size: 2.5rem; color: #00c6ff;"></i>
+                        <h4 class="mt-2">ENVOYER UN MESSAGE</h4>
+                        <p class="small text-muted">2 premiers messages gratuits</p>
+                        <button id="goToMessageBtn" class="btn-premium w-100 mt-2"><i class="bi bi-arrow-right"></i> Commencer</button>
+                    </div>
+                </div>
+                <div class="col-12 animate-on-load" style="animation-delay: 0.6s;">
+                    <div class="glass-card p-4 text-center">
+                        <i class="bi bi-telephone-forward-fill" style="font-size: 2.5rem; color: #ff5e7c;"></i>
+                        <h4 class="mt-2">RÉSERVER UN APPEL</h4>
+                        <p class="small text-muted">Appel privé avec Le Prof</p>
+                        <button id="goToCallBtn" class="btn-premium w-100 mt-2"><i class="bi bi-arrow-right"></i> Réserver</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sélecteur de devise -->
+            <div class="mt-4 text-center animate-on-load" style="animation-delay: 0.7s;">
+                <div class="dropdown">
+                    <button class="btn btn-outline-light rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown"><i class="bi bi-currency-exchange"></i> Devise</button>
+                    <ul class="dropdown-menu dropdown-menu-dark" id="currencySelector">
+                        <li><a class="dropdown-item" data-currency="USD">💵 USD</a></li>
+                        <li><a class="dropdown-item" data-currency="EUR">💶 EUR</a></li>
+                        <li><a class="dropdown-item" data-currency="GBP">💷 GBP</a></li>
+                        <li><a class="dropdown-item" data-currency="CNY">🇨🇳 CNY</a></li>
+                        <li><a class="dropdown-item" data-currency="RUB">₽ RUB</a></li>
+                        <li><a class="dropdown-item" data-currency="CDF">💰 CDF</a></li>
+                        <li><a class="dropdown-item" data-currency="XOF">🪙 XOF</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE MESSAGERIE -->
+    <div id="chatPage" class="page">
+        <div class="container py-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button id="backToHomeFromChat" class="btn btn-sm btn-secondary rounded-pill"><i class="bi bi-arrow-left"></i> Retour</button>
+                <span id="chatCounter" class="badge bg-info rounded-pill p-2">💬 Messages restants: 2</span>
+            </div>
+
+            <div class="glass-card p-3 mb-3" style="height: 55vh; display: flex; flex-direction: column;">
+                <div class="d-flex align-items-center gap-2 pb-2 border-bottom border-secondary mb-2">
+                    <img src="prof.png" alt="Prof" style="width: 55px; height: 55px; border-radius: 50%; object-fit: contain; background: rgba(0,198,255,0.2); padding: 8px;" onerror="this.src='https://placehold.co/55x55/00c6ff/white?text=P'">
+                    <div><strong>Le Prof</strong> <i class="bi bi-check-circle-fill text-primary small"></i><br><small class="text-muted">En ligne</small></div>
+                </div>
+                <div id="chatMessagesArea" class="flex-grow-1 overflow-auto mb-3 d-flex flex-column gap-2"></div>
+                <div class="input-group">
+                    <input type="text" id="chatInput" class="form-control bg-dark text-white" placeholder="Votre message..." style="border-radius: 2rem;">
+                    <button id="sendMsgBtn" class="btn btn-primary rounded-pill"><i class="bi bi-send"></i></button>
+                </div>
+            </div>
+
+            <div id="chatForfaitBlock" class="text-center glass-card p-3"></div>
+        </div>
+    </div>
+
+    <!-- PAGE FORFAITS -->
+    <div id="packPage" class="page d-flex align-items-center justify-content-center">
+        <div class="glass-card p-4" style="max-width: 500px; width: 90%; max-height: 85vh; overflow: auto;">
+            <h4 class="text-center" id="packTitle">Forfaits disponibles</h4>
+            <div id="packListArea"></div>
+            <button id="closePackPage" class="btn btn-secondary w-100 mt-3">Annuler</button>
+        </div>
+    </div>
+
+    <!-- PAGE PAIEMENT -->
+    <div id="paymentPage" class="page d-flex align-items-center justify-content-center">
+        <div class="glass-card p-4" style="max-width: 500px; width: 90%; max-height: 85vh; overflow: auto;">
+            <h4 class="text-center">Paiement sécurisé</h4>
+            <div id="paymentMethodArea" class="mt-3"></div>
+            <div id="paymentFormArea" class="mt-3"></div>
+            <div id="paymentProgress" style="display:none;" class="mt-3">
+                <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%"></div></div>
+                <p class="text-center mt-2" id="progressStatus"></p>
+            </div>
+            <button id="closePaymentPage" class="btn btn-secondary w-100 mt-3">Annuler</button>
+        </div>
+    </div>
+
+    <!-- PAGE APPEL -->
+    <div id="callPage" class="page d-flex align-items-center justify-content-center text-center">
+        <div class="glass-card p-4" style="max-width: 400px; width: 90%;">
+            <div class="profile-logo mx-auto" style="width: 160px; height: 160px;">
+                <img src="prof.png" alt="Le Prof" style="width:100%; height:100%; object-fit:contain;" onerror="this.src='https://placehold.co/160x160/00c6ff/white?text=PROF'">
+            </div>
+            <h3 class="mt-3">Le Prof <i class="bi bi-check-circle-fill text-primary"></i></h3>
+            <div class="call-timer" id="callTimerDisplay">10:00</div>
+            <div class="mt-2 text-info"><i class="bi bi-soundwave"></i> <span id="callStatus">Connexion...</span></div>
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button class="btn btn-outline-light rounded-circle p-2"><i class="bi bi-mic-fill fs-4"></i></button>
+                <button class="btn btn-outline-light rounded-circle p-2"><i class="bi bi-volume-up-fill fs-4"></i></button>
+                <button class="btn btn-outline-light rounded-circle p-2"><i class="bi bi-camera-fill fs-4"></i></button>
+                <button id="hangupCallBtn" class="btn btn-danger rounded-circle p-3"><i class="bi bi-telephone-x fs-3"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE FIN DE SESSION -->
+    <div id="endPage" class="page d-flex align-items-center justify-content-center text-center">
+        <div class="glass-card p-5">
+            <i class="bi bi-check-circle-fill text-success fs-1"></i>
+            <h3 class="mt-3">Session terminée</h3>
+            <p>Merci d'avoir utilisé Meet The Prof.</p>
+            <button id="newCallBtn" class="btn-premium m-2"><i class="bi bi-telephone"></i> Réserver un appel</button>
+            <button id="buyMsgEndBtn" class="btn-premium m-2"><i class="bi bi-chat"></i> Acheter des messages</button>
+            <button id="homeEndBtn" class="btn btn-outline-light m-2"><i class="bi bi-house"></i> Retour accueil</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ==================== DONNÉES ====================
+    let freeMsgCount = 0;
+    let paidMsgCredits = 0;
+    let currentCurrency = "USD";
+    let callInterval = null;
+    let callSecondsLeft = 0;
+    let currentPackType = null;
+    let pendingCallback = null;
+
+    const exchangeRates = { USD: 1, EUR: 0.92, GBP: 0.79, CNY: 7.25, RUB: 92, CDF: 2800, XOF: 610 };
+    
+    function convertPrice(usdPrice) { return Math.round(usdPrice * exchangeRates[currentCurrency] * 100) / 100; }
+    function formatPrice(usdPrice) { 
+        const sym = { USD: "$", EUR: "€", GBP: "£", CNY: "¥", RUB: "₽", CDF: "FC", XOF: "CFA" };
+        return `${convertPrice(usdPrice)} ${sym[currentCurrency] || "$"}`;
+    }
+
+    // Navigation 3D fluide (transition de 5 secondes)
+    function switchPage(fromId, toId) {
+        let fromPage = document.getElementById(fromId);
+        let toPage = document.getElementById(toId);
+        if (fromPage) {
+            fromPage.classList.remove("active");
+            fromPage.classList.add("exit");
+        }
+        setTimeout(() => {
+            if (toPage) {
+                toPage.classList.remove("exit");
+                toPage.classList.add("active");
+            }
+            if (fromPage) fromPage.classList.remove("exit");
+        }, 1200);
+    }
+
+    // ==================== MESSAGERIE ====================
+    function initChat() {
+        freeMsgCount = 0;
+        paidMsgCredits = 0;
+        document.getElementById("chatMessagesArea").innerHTML = "";
+        addChatMessage("✨ Bienvenue ! Les 2 premiers messages sont gratuits. Envoyez votre premier message !", false);
+        updateChatUI();
+        switchPage("homePage", "chatPage");
+    }
+
+    function addChatMessage(text, isUser) {
+        let area = document.getElementById("chatMessagesArea");
+        let bubble = document.createElement("div");
+        bubble.className = isUser ? "chat-bubble-user align-self-end" : "chat-bubble-prof align-self-start";
+        bubble.innerHTML = `${text}<div class="small text-muted mt-1">${new Date().toLocaleTimeString()}</div>`;
+        area.appendChild(bubble);
+        bubble.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function updateChatUI() {
+        let freeLeft = Math.max(0, 2 - freeMsgCount);
+        let total = freeLeft + paidMsgCredits;
+        document.getElementById("chatCounter").innerHTML = `💬 Messages restants: ${total}`;
+        
+        let blockDiv = document.getElementById("chatForfaitBlock");
+        if (total <= 0 && freeMsgCount >= 2 && paidMsgCredits === 0) {
+            blockDiv.innerHTML = `<div class="alert alert-warning">⚠️ Vous avez utilisé vos messages gratuits. Choisissez un forfait. <button id="buyPackFromChat" class="btn btn-sm btn-info mt-2">Acheter des messages</button></div>`;
+            document.getElementById("buyPackFromChat")?.addEventListener("click", () => showPackages("msg"));
+        } else {
+            blockDiv.innerHTML = `<div class="small text-muted">✨ Gratuits restants: ${freeLeft} | Payants: ${paidMsgCredits}</div><button id="buyMoreFromChat" class="btn btn-sm btn-outline-light mt-1">➕ Forfaits messages</button>`;
+            document.getElementById("buyMoreFromChat")?.addEventListener("click", () => showPackages("msg"));
+        }
+    }
+
+    function sendMessage() {
+        let input = document.getElementById("chatInput");
+        let msg = input.value.trim();
+        if (!msg) return;
+        
+        let freeLeft = Math.max(0, 2 - freeMsgCount);
+        let total = freeLeft + paidMsgCredits;
+        
+        if (total <= 0) {
+            addChatMessage("❌ Plus de crédits. Veuillez acheter un forfait pour continuer.", false);
+            return;
+        }
+        
+        if (freeMsgCount < 2) {
+            freeMsgCount++;
+            addChatMessage(msg, true);
+            setTimeout(() => {
+                addChatMessage("🙌 Merci pour ton message ! Je te réponds très vite. 🙌", false);
+            }, 800);
+        } else if (paidMsgCredits > 0) {
+            paidMsgCredits--;
+            addChatMessage(msg, true);
+            setTimeout(() => {
+                addChatMessage("💬 (Réponse Premium) Merci infiniment pour ton soutien ! Tu es au top ! 🔥", false);
+            }, 800);
+        }
+        
+        updateChatUI();
+        input.value = "";
+    }
+
+    // ==================== FORFAITS ====================
+    function showPackages(type) {
+        currentPackType = type;
+        let packs = [];
+        if (type === "msg") {
+            packs = [
+                { name: "Starter - 15 messages", priceUSD: 5, credits: 15 },
+                { name: "Premium - 50 messages", priceUSD: 15, credits: 50 },
+                { name: "VIP - Messages illimités (30j)", priceUSD: 25, credits: 9999 }
+            ];
+            document.getElementById("packTitle").innerText = "Forfaits Messages";
+        } else {
+            packs = [
+                { name: "Bronze - 10 minutes", priceUSD: 20, seconds: 600 },
+                { name: "Silver - 20 minutes", priceUSD: 50, seconds: 1200 },
+                { name: "Gold - 30 minutes", priceUSD: 75, seconds: 1800 }
+            ];
+            document.getElementById("packTitle").innerText = "Forfaits Appels";
+        }
+        
+        let packArea = document.getElementById("packListArea");
+        packArea.innerHTML = "";
+        packs.forEach(pack => {
+            let btn = document.createElement("button");
+            btn.className = "btn btn-outline-info m-2 rounded-pill w-100";
+            btn.innerText = `${pack.name} - ${formatPrice(pack.priceUSD)}`;
+            btn.onclick = () => {
+                if (type === "msg") {
+                    pendingCallback = () => {
+                        paidMsgCredits += pack.credits;
+                        updateChatUI();
+                        addChatMessage(`🎉 Forfait ${pack.name} activé ! Vous pouvez maintenant envoyer plus de messages.`, false);
+                        switchPage("packPage", "chatPage");
+                    };
+                } else {
+                    pendingCallback = () => {
+                        startCall(pack.seconds);
+                    };
+                }
+                showPayment(pack.priceUSD);
+            };
+            packArea.appendChild(btn);
+        });
+        switchPage("chatPage", "packPage");
+    }
+
+    // ==================== PAIEMENT ====================
+    function showPayment(amountUSD) {
+        let methodDiv = document.getElementById("paymentMethodArea");
+        let formDiv = document.getElementById("paymentFormArea");
+        
+        methodDiv.innerHTML = `<label>Mode de paiement :</label><div class="d-flex flex-wrap gap-2 mt-2" id="paymentMethodsList"></div>`;
+        let methods = [
+            { name: "Visa", icon: "bi-credit-card" },
+            { name: "Mastercard", icon: "bi-credit-card-2-back" },
+            { name: "M-Pesa", icon: "bi-phone" },
+            { name: "Orange Money", icon: "bi-phone-fill" },
+            { name: "Airtel Money", icon: "bi-sim-fill" }
+        ];
+        let container = document.getElementById("paymentMethodsList");
+        
+        methods.forEach(m => {
+            let btn = document.createElement("button");
+            btn.className = "btn btn-outline-light rounded-pill m-1";
+            btn.innerHTML = `<i class="${m.icon}"></i> ${m.name}`;
+            btn.onclick = () => {
+                if (m.name === "Visa" || m.name === "Mastercard") {
+                    formDiv.innerHTML = `
+                        <input class="form-control mb-2" placeholder="Nom sur la carte">
+                        <input class="form-control mb-2" placeholder="Numéro de carte">
+                        <input class="form-control mb-2" placeholder="MM/AA">
+                        <input class="form-control mb-2" placeholder="CVV">
+                        <button id="confirmPayBtn" class="btn btn-success w-100">Payer ${formatPrice(amountUSD)}</button>
+                    `;
+                } else {
+                    formDiv.innerHTML = `
+                        <input class="form-control mb-2" placeholder="Numéro de téléphone">
+                        <button id="confirmPayBtn" class="btn btn-success w-100">Confirmer paiement ${formatPrice(amountUSD)}</button>
+                    `;
+                }
+                document.getElementById("confirmPayBtn").onclick = async () => {
+                    let progressDiv = document.getElementById("paymentProgress");
+                    let progressBar = progressDiv.querySelector(".progress-bar");
+                    progressDiv.style.display = "block";
+                    let steps = ["Vérification...", "Traitement...", "Validation...", "Paiement accepté"];
+                    for (let i = 0; i <= 100; i += 25) {
+                        progressBar.style.width = `${i}%`;
+                        document.getElementById("progressStatus").innerText = steps[i / 25];
+                        await new Promise(r => setTimeout(r, 500));
+                    }
+                    setTimeout(() => {
+                        progressDiv.style.display = "none";
+                        switchPage("paymentPage", "packPage");
+                        
+                        let notif = document.createElement("div");
+                        notif.className = "position-fixed bottom-0 end-0 m-3 bg-dark text-white p-3 rounded-4 shadow-lg";
+                        notif.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> ✅ Votre demande a été envoyée au Prof.<br><small>💰 ${formatPrice(amountUSD)} · 80% influenceur / 20% plateforme</small>`;
+                        document.body.appendChild(notif);
+                        setTimeout(() => notif.remove(), 3000);
+                        
+                        setTimeout(() => {
+                            let notif2 = document.createElement("div");
+                            notif2.className = "position-fixed bottom-0 end-0 m-3 bg-dark text-white p-3 rounded-4 shadow-lg";
+                            notif2.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> ✅ Le Prof a accepté votre demande !`;
+                            document.body.appendChild(notif2);
+                            setTimeout(() => notif2.remove(), 3000);
+                        }, 1500);
+                        
+                        if (pendingCallback) pendingCallback();
+                        pendingCallback = null;
+                    }, 500);
+                };
+            };
+            container.appendChild(btn);
+        });
+        switchPage("packPage", "paymentPage");
+    }
+
+    // ==================== APPEL ====================
+    function startCall(seconds) {
+        callSecondsLeft = seconds;
+        updateCallTimer();
+        let statusSpan = document.getElementById("callStatus");
+        statusSpan.innerHTML = "Connexion...";
+        
+        setTimeout(() => { statusSpan.innerHTML = "Sonnerie... 📞"; }, 800);
+        setTimeout(() => { statusSpan.innerHTML = "Appel connecté 🔵"; }, 2000);
+        
+        if (callInterval) clearInterval(callInterval);
+        callInterval = setInterval(() => {
+            if (callSecondsLeft <= 0) {
+                clearInterval(callInterval);
+                statusSpan.innerHTML = "Appel terminé";
+                setTimeout(() => endCall(), 1000);
+            } else {
+                callSecondsLeft--;
+                updateCallTimer();
+                if (callSecondsLeft === 30) {
+                    let warn = document.createElement("div");
+                    warn.className = "alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-3";
+                    warn.innerText = "⚠️ Votre session se termine dans quelques instants (30 secondes restantes)";
+                    document.body.appendChild(warn);
+                    setTimeout(() => warn.remove(), 3000);
+                }
+            }
+        }, 1000);
+        
+        switchPage("packPage", "callPage");
+        document.getElementById("hangupCallBtn").onclick = () => { clearInterval(callInterval); endCall(); };
+    }
+    
+    function updateCallTimer() {
+        let mins = Math.floor(callSecondsLeft / 60);
+        let secs = callSecondsLeft % 60;
+        document.getElementById("callTimerDisplay").innerHTML = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function endCall() {
+        if (callInterval) clearInterval(callInterval);
+        switchPage("callPage", "endPage");
+    }
+
+    // ==================== ÉVÈNEMENTS ====================
+    document.getElementById("goToMessageBtn").onclick = () => initChat();
+    document.getElementById("goToCallBtn").onclick = () => showPackages("call");
+    document.getElementById("backToHomeFromChat").onclick = () => switchPage("chatPage", "homePage");
+    document.getElementById("sendMsgBtn").onclick = sendMessage;
+    document.getElementById("chatInput").addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+    document.getElementById("closePackPage").onclick = () => switchPage("packPage", "chatPage");
+    document.getElementById("closePaymentPage").onclick = () => switchPage("paymentPage", "packPage");
+    document.getElementById("newCallBtn").onclick = () => { switchPage("endPage", "homePage"); setTimeout(() => showPackages("call"), 200); };
+    document.getElementById("buyMsgEndBtn").onclick = () => { switchPage("endPage", "homePage"); setTimeout(() => initChat(), 200); };
+    document.getElementById("homeEndBtn").onclick = () => switchPage("endPage", "homePage");
+    
+    // Devise
+    document.querySelectorAll("[data-currency]").forEach(el => {
+        el.addEventListener("click", (e) => {
+            currentCurrency = e.target.getAttribute("data-currency");
+        });
+    });
+    
+    // LOADER 10 SECONDES AVEC ANIMATION LENTE
+    setTimeout(() => {
+        let loader = document.getElementById("loaderScreen");
+        loader.style.opacity = "0";
+        setTimeout(() => {
+            loader.style.display = "none";
+            document.getElementById("appContainer").style.display = "block";
+        }, 1500);
+    }, 10000);
+</script>
+</body>
+</html>
